@@ -40,4 +40,5 @@ RUN ./Configure --prefix=/usr/local/openssl os/compiler:arm-linux-gnueabihf
 RUN make CC="arm-linux-gnueabihf-gcc" AR="arm-linux-gnueabihf-ar r" RANLIB="arm-linux-gnueabihf-ranlib"
 RUN make install
 
-WORKDIR /
+RUN mkdir build
+WORKDIR /build
