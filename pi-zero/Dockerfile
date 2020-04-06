@@ -36,7 +36,7 @@ RUN echo "Build and install openssl......"
 RUN mkdir /usr/local/openssl
 RUN wget -O openssl.tar.gz https://github.com/openssl/openssl/archive/OpenSSL_1_0_2u.tar.gz && tar -xzf openssl.tar.gz
 WORKDIR /openssl-OpenSSL_1_0_2u
-RUN ./Configure --prefix=/usr/local/openssl os/compiler:arm-linux-gnueabihf
+RUN ./Configure no-ssl2 no-ssl3 no-dtls no-dtls1 --prefix=/usr/local/openssl os/compiler:arm-linux-gnueabihf
 RUN make CC="arm-linux-gnueabihf-gcc" AR="arm-linux-gnueabihf-ar r" RANLIB="arm-linux-gnueabihf-ranlib"
 RUN make install
 
