@@ -23,7 +23,7 @@ RUN git clone --progress --verbose https://github.com/raspberrypi/tools.git --de
 ENV PATH "/pitools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin:$PATH"
 
 # install golang
-RUN echo "Install golang......"
+RUN echo "Build and install golang......"
 RUN wget https://dl.google.com/go/go1.13.3.linux-amd64.tar.gz && tar -xvf go1.13.3.linux-amd64.tar.gz
 RUN mv go /usr/local
 ENV GOROOT "/usr/local/go"
@@ -32,10 +32,10 @@ ENV GOPATH "/go"
 ENV PATH "$GOPATH/bin:$GOROOT/bin:$PATH"
 
 # install openssl
-RUN echo "Install openssl......"
-RUN wget https://www.openssl.org/source/openssl-1.0.2l.tar.gz && tar xzf openssl-1.0.2l.tar.gz
+RUN echo "Build and install openssl......"
 RUN mkdir /usr/local/openssl
-WORKDIR /openssl-1.0.2l
+RUN wget -O openssl.tar.gz https://github.com/openssl/openssl/archive/OpenSSL_1_0_2u.tar.gz && tar -xzf openssl.tar.gz
+WORKDIR /openssl-OpenSSL_1_0_2u
 RUN ./Configure --prefix=/usr/local/openssl os/compiler:arm-linux-gnueabihf
 RUN make CC="arm-linux-gnueabihf-gcc" AR="arm-linux-gnueabihf-ar r" RANLIB="arm-linux-gnueabihf-ranlib"
 RUN make install
