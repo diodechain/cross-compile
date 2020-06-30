@@ -29,7 +29,9 @@ RUN ln -s `which arm-linux-gnueabihf-strip` /pitools/arm-bcm2708/gcc-linaro-arm-
 
 # install golang
 RUN echo "Build and install golang......"
-RUN wget https://dl.google.com/go/go1.13.3.linux-amd64.tar.gz && tar -xvf go1.13.3.linux-amd64.tar.gz
+RUN wget https://dl.google.com/go/go1.14.4.linux-amd64.tar.gz && \
+    [ "aed845e4185a0b2a3c3d5e1d0a35491702c55889192bb9c30e67a3de6849c067" = "$(sha256sum go1.14.4.linux-amd64.tar.gz | cut -d ' ' -f1)" ] && \
+    tar -xvf go1.14.4.linux-amd64.tar.gz
 RUN mv go /usr/local
 ENV GOROOT "/usr/local/go"
 RUN mkdir /go
@@ -39,7 +41,9 @@ ENV PATH "$GOPATH/bin:$GOROOT/bin:$PATH"
 # install openssl
 RUN echo "Build and install openssl......"
 RUN mkdir /usr/local/openssl
-RUN wget -O openssl.tar.gz https://github.com/openssl/openssl/archive/OpenSSL_1_0_2u.tar.gz && tar -xzf openssl.tar.gz
+RUN wget -O openssl.tar.gz https://github.com/openssl/openssl/archive/OpenSSL_1_0_2u.tar.gz && \
+    [ "82fa58e3f273c53128c6fe7e3635ec8cda1319a10ce1ad50a987c3df0deeef05" = "$(sha256sum openssl.tar.gz | cut -d ' ' -f1)" ] && \
+    tar -xzf openssl.tar.gz
 WORKDIR /openssl-OpenSSL_1_0_2u
 RUN ./Configure no-ssl2 no-ssl3 no-dtls no-dtls1 --prefix=/usr/local/openssl os/compiler:arm-linux-gnueabihf
 RUN make CC="arm-linux-gnueabihf-gcc" AR="arm-linux-gnueabihf-ar r" RANLIB="arm-linux-gnueabihf-ranlib"
