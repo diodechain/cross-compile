@@ -20,7 +20,7 @@ RUN apt-get update -y && \
     apt-get install -y wget
 
 # for building raspberry pi firmware
-RUN echo "Downlaod raspberrypi tools......"
+RUN echo "Downloading raspberrypi tools......"
 RUN git clone --progress --verbose https://github.com/raspberrypi/tools.git --depth=1 pitools
 ENV PATH "/pitools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin:$PATH"
 
@@ -38,21 +38,25 @@ RUN mkdir /go
 ENV GOPATH "/go"
 ENV PATH "$GOPATH/bin:$GOROOT/bin:$PATH"
 
-# install openssl
-RUN echo "Build and install openssl......"
-RUN mkdir /usr/local/openssl
-RUN wget -O openssl.tar.gz https://github.com/openssl/openssl/archive/OpenSSL_1_0_2u.tar.gz && \
-    [ "82fa58e3f273c53128c6fe7e3635ec8cda1319a10ce1ad50a987c3df0deeef05" = "$(sha256sum openssl.tar.gz | cut -d ' ' -f1)" ] && \
-    tar -xzf openssl.tar.gz
-WORKDIR /openssl-OpenSSL_1_0_2u
-RUN ./Configure no-ssl2 no-ssl3 no-dtls no-dtls1 --prefix=/usr/local/openssl os/compiler:arm-linux-gnueabihf
-RUN make CC="arm-linux-gnueabihf-gcc" AR="arm-linux-gnueabihf-ar r" RANLIB="arm-linux-gnueabihf-ranlib"
-RUN make install
-ENV PKG_CONFIG_PATH=/usr/local/openssl/lib/pkgconfig
-
 RUN mkdir build
 WORKDIR /build
 
+# install openssl
+RUN echo "Installing openssl......"
+COPY *.deb ./
+RUN mkdir /openssl && \
+    ar x libssl1.1_1.1.1d-0+deb10u3+rpt1_armhf.deb && \
+    tar -C /openssl/ -xJf data.tar.xz && \
+    ar x libssl-dev_1.1.1d-0+deb10u3+rpt1_armhf.deb && \
+    tar -C /openssl/ -xJf data.tar.xz && \
+    ar x libc6_2.28-10+rpi1_armhf.deb && \
+    tar -C /pitools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/arm-linux-gnueabihf/libc/ -xJf data.tar.xz
+
+ENV PKG_CONFIG_PATH /openssl/usr/lib/arm-linux-gnueabihf/pkgconfig
+ENV CPATH /openssl/usr/include/:/openssl/usr/include/arm-linux-gnueabihf/
+ENV CGO_LDFLAGS "-L/openssl/lib/arm-linux-gnueabihf -L/openssl/usr/lib/arm-linux-gnueabihf"
+
+# build diode
 RUN git clone https://github.com/diodechain/diode_go_client.git
 WORKDIR /build/diode_go_client
 RUN make
