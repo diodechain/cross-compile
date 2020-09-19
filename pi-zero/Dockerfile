@@ -7,8 +7,8 @@ LABEL crosscompie={pizero}
 ENV GOOS=linux
 ENV GOARCH=arm
 ENV GOARM=6
-ENV CC=arm-linux-gnueabihf-gcc
-ENV CXX=arm-linux-gnueabihf-g++
+ENV CC="arm-linux-gnueabihf-gcc -O3 -march=armv6"
+ENV CXX="arm-linux-gnueabihf-g++ -O3 -march=armv6"
 ENV CGO_ENABLED=1
 
 RUN apt-get update -y && \
@@ -46,7 +46,7 @@ RUN wget -O openssl.tar.gz https://github.com/openssl/openssl/archive/OpenSSL_1_
     tar -xzf openssl.tar.gz
 WORKDIR /openssl-OpenSSL_1_0_2u
 RUN ./Configure no-ssl2 no-ssl3 no-dtls no-dtls1 --prefix=/usr/local/openssl os/compiler:arm-linux-gnueabihf
-RUN make CC="arm-linux-gnueabihf-gcc" AR="arm-linux-gnueabihf-ar r" RANLIB="arm-linux-gnueabihf-ranlib"
+RUN make CC="arm-linux-gnueabihf-gcc -O3 -march=armv6" AR="arm-linux-gnueabihf-ar r" RANLIB="arm-linux-gnueabihf-ranlib"
 RUN make install
 ENV PKG_CONFIG_PATH=/usr/local/openssl/lib/pkgconfig
 
