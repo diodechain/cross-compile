@@ -7,8 +7,10 @@ LABEL crosscompie={pizero}
 ENV GOOS=linux
 ENV GOARCH=arm
 ENV GOARM=6
-ENV CC=arm-linux-gnueabihf-gcc
-ENV CXX=arm-linux-gnueabihf-g++
+ENV CC="arm-linux-gnueabihf-gcc -O3"
+ENV CXX="arm-linux-gnueabihf-g++ -O3"
+ENV AR="arm-linux-gnueabihf-ar r"
+ENV RANLIB="arm-linux-gnueabihf-ranlib"
 ENV CGO_ENABLED=1
 
 RUN apt-get update -y && \
@@ -52,16 +54,21 @@ RUN mkdir /openssl && \
     ar x libc6_2.28-10+rpi1_armhf.deb && \
     tar -C /pitools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/arm-linux-gnueabihf/libc/ -xJf data.tar.xz
 
+# Couldn't get this to work, so using sed instead...
+# ENV PKG_CONFIG_LIBSSL_PREFIX /openssl/usr
+# ENV PKG_CONFIG_LIBCRYPTO_PREFIX /openssl/usr
+RUN sed -i -e 's!/usr!/openssl/usr!' /openssl/usr/lib/arm-linux-gnueabihf/pkgconfig/libcrypto.pc && \
+    sed -i -e 's!/usr!/openssl/usr!' /openssl/usr/lib/arm-linux-gnueabihf/pkgconfig/libssl.pc
+
 ENV PKG_CONFIG_PATH /openssl/usr/lib/arm-linux-gnueabihf/pkgconfig
 ENV CPATH /openssl/usr/include/:/openssl/usr/include/arm-linux-gnueabihf/
-ENV CGO_LDFLAGS "-L/openssl/lib/arm-linux-gnueabihf -L/openssl/usr/lib/arm-linux-gnueabihf"
+ENV CGO_LDFLAGS "-L/openssl/usr/lib/arm-linux-gnueabihf/ -l:libssl.a -l:libcrypto.a -ldl"
 
 # build diode
 RUN git clone https://github.com/diodechain/diode_go_client.git
 WORKDIR /build/diode_go_client
-RUN make
 
 ARG branch=master
-RUN git pull
-RUN git checkout $branch
+RUN git fetch origin
+RUN git reset --hard origin/$branch
 RUN make archive
