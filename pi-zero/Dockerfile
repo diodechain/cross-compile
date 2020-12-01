@@ -7,8 +7,8 @@ LABEL crosscompie={pizero}
 ENV GOOS=linux
 ENV GOARCH=arm
 ENV GOARM=6
-ENV CC="arm-linux-gnueabihf-gcc -O3 -march=armv6"
-ENV CXX="arm-linux-gnueabihf-g++ -O3 -march=armv6"
+ENV CC="arm-linux-gnueabihf-gcc -O3 -march=armv6 -mfloat-abi=hard -mfpu=vfp"
+ENV CXX="arm-linux-gnueabihf-g++ -O3 -march=armv6 -mfloat-abi=hard -mfpu=vfp"
 ENV CGO_ENABLED=1
 
 RUN apt-get update -y && \
@@ -29,9 +29,10 @@ RUN ln -s `which arm-linux-gnueabihf-strip` /pitools/arm-bcm2708/gcc-linaro-arm-
 
 # install golang
 RUN echo "Build and install golang......"
-RUN wget https://dl.google.com/go/go1.14.4.linux-amd64.tar.gz && \
-    [ "aed845e4185a0b2a3c3d5e1d0a35491702c55889192bb9c30e67a3de6849c067" = "$(sha256sum go1.14.4.linux-amd64.tar.gz | cut -d ' ' -f1)" ] && \
-    tar -xvf go1.14.4.linux-amd64.tar.gz
+ENV GOFILE=go1.15.5.linux-amd64.tar.gz
+RUN wget https://dl.google.com/go/$GOFILE && \
+    [ "9a58494e8da722c3aef248c9227b0e9c528c7318309827780f16220998180a0d" = "$(sha256sum $GOFILE | cut -d ' ' -f1)" ] && \
+    tar -xvf $GOFILE
 RUN mv go /usr/local
 ENV GOROOT "/usr/local/go"
 RUN mkdir /go
@@ -46,7 +47,7 @@ RUN wget -O openssl.tar.gz https://github.com/openssl/openssl/archive/OpenSSL_1_
     tar -xzf openssl.tar.gz
 WORKDIR /openssl-OpenSSL_1_0_2u
 RUN ./Configure no-ssl2 no-ssl3 no-dtls no-dtls1 --prefix=/usr/local/openssl os/compiler:arm-linux-gnueabihf
-RUN make CC="arm-linux-gnueabihf-gcc -O3 -march=armv6" AR="arm-linux-gnueabihf-ar r" RANLIB="arm-linux-gnueabihf-ranlib"
+RUN make AR="arm-linux-gnueabihf-ar r" RANLIB="arm-linux-gnueabihf-ranlib"
 RUN make install
 ENV PKG_CONFIG_PATH=/usr/local/openssl/lib/pkgconfig
 
