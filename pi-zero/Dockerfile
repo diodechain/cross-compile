@@ -46,7 +46,7 @@ RUN wget -O openssl.tar.gz https://www.openssl.org/source/openssl-1.1.0l.tar.gz 
     [ "74a2f756c64fd7386a29184dc0344f4831192d61dc2481a93a4c5dd727f41148" = "$(sha256sum openssl.tar.gz | cut -d ' ' -f1)" ] && \
     tar -xzf openssl.tar.gz
 WORKDIR /openssl-1.1.0l
-RUN ./Configure no-ssl3 no-ssl3-method no-zlib --prefix=/usr/local/openssl linux-armv4
+RUN ./Configure no-ssl3 no-ssl3-method no-zlib no-asm no-shared --prefix=/usr/local/openssl linux-armv4
 RUN make AR="arm-linux-gnueabihf-ar r" RANLIB="arm-linux-gnueabihf-ranlib"
 RUN make install_sw install_ssldirs
 ENV PKG_CONFIG_PATH=/usr/local/openssl/lib/pkgconfig
