@@ -42,13 +42,13 @@ ENV PATH "$GOPATH/bin:$GOROOT/bin:$PATH"
 # install openssl
 RUN echo "Build and install openssl......"
 RUN mkdir /usr/local/openssl
-RUN wget -O openssl.tar.gz https://github.com/openssl/openssl/archive/OpenSSL_1_0_2u.tar.gz && \
-    [ "82fa58e3f273c53128c6fe7e3635ec8cda1319a10ce1ad50a987c3df0deeef05" = "$(sha256sum openssl.tar.gz | cut -d ' ' -f1)" ] && \
+RUN wget -O openssl.tar.gz https://www.openssl.org/source/openssl-1.1.0l.tar.gz && \
+    [ "74a2f756c64fd7386a29184dc0344f4831192d61dc2481a93a4c5dd727f41148" = "$(sha256sum openssl.tar.gz | cut -d ' ' -f1)" ] && \
     tar -xzf openssl.tar.gz
-WORKDIR /openssl-OpenSSL_1_0_2u
-RUN ./Configure no-ssl2 no-ssl3 no-dtls no-dtls1 --prefix=/usr/local/openssl os/compiler:arm-linux-gnueabihf
+WORKDIR /openssl-1.1.0l
+RUN ./Configure no-ssl3 no-ssl3-method no-zlib --prefix=/usr/local/openssl linux-armv4
 RUN make AR="arm-linux-gnueabihf-ar r" RANLIB="arm-linux-gnueabihf-ranlib"
-RUN make install
+RUN make install_sw install_ssldirs
 ENV PKG_CONFIG_PATH=/usr/local/openssl/lib/pkgconfig
 
 RUN mkdir build
