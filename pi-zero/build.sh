@@ -4,4 +4,4 @@ if [[ "$1" == "" ]]; then
 	exit
 fi
 docker build --build-arg branch=$1 -t pi-zero .
-docker run --rm --entrypoint cat pi-zero /build/diode_go_client/diode_linux_amd64.zip > diode_linux_arm.zip
+docker run --rm --entrypoint cat pi-zero /build/diode_client/diode_linux_amd64.zip > diode_linux_arm.zip

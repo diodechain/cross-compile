@@ -54,8 +54,8 @@ ENV PKG_CONFIG_PATH=/usr/local/openssl/lib/pkgconfig
 RUN mkdir build
 WORKDIR /build
 
-RUN git clone https://github.com/diodechain/diode_go_client.git
-WORKDIR /build/diode_go_client
+RUN git clone https://github.com/diodechain/diode_client.git
+WORKDIR /build/diode_client
 
 ARG branch=master
 RUN git pull
